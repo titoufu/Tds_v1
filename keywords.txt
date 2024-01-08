@@ -1,0 +1,27 @@
+#######################################
+# Syntax Coloring Map For DFRobot Gravity TDS Sensor
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+filtro	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+bubbleSort	KEYWORD2
+medianFilter	KEYWORD2
+getMedianNum	KEYWORD2
+findMedian	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################

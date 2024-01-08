@@ -1,0 +1,32 @@
+[
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\jribe\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\cores\\esp8266"
+  },
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\jribe\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\variants\\d1_mini"
+  },
+  {
+    "Sourcefile": "C:\\Users\\jribe\\OneDrive\\Documentos\\Arduino\\Tds_v1\\examples\\Tds_v1\\build\\sketch\\Tds_v1.ino.cpp",
+    "Include": "EEPROM.h",
+    "Includepath": "C:\\Users\\jribe\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\EEPROM"
+  },
+  {
+    "Sourcefile": "C:\\Users\\jribe\\OneDrive\\Documentos\\Arduino\\Tds_v1\\examples\\Tds_v1\\build\\sketch\\Tds_v1.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\jribe\\OneDrive\\Documentos\\Arduino\\Tds_v1\\examples\\Tds_v1\\build\\sketch\\Tds_class.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\jribe\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.1.2\\libraries\\EEPROM\\EEPROM.cpp",
+    "Include": "",
+    "Includepath": null
+  }
+]
