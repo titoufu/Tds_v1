@@ -1,19 +1,6 @@
 #include <EEPROM.h>
 #include "Tds_class.h"
-#define EEPROM_write(address, p)        \
-  {                                     \
-    int i = 0;                          \
-    byte *pp = (byte *)&(p);            \
-    for (; i < sizeof(p); i++)          \
-      EEPROM.write(address + i, pp[i]); \
-  }
-#define EEPROM_read(address, p)         \
-  {                                     \
-    int i = 0;                          \
-    byte *pp = (byte *)&(p);            \
-    for (; i < sizeof(p); i++)          \
-      pp[i] = EEPROM.read(address + i); \
-  }
+#define EEPROM_write(address, p)
 
 Tds_class::~Tds_class()
 {
@@ -23,8 +10,8 @@ Tds_class::Tds_class()
   this->pinSensor = TdsSensorPin;
   this->pinCalibra = TdsCalibraPin;
   this->temperature = 25.0;
-  this->aref = 5.0;
-  this->adcRange = 1024.0;
+  this->aref = 3.032;
+  this->adcRange = 1023.0;
   this->kValueAddress = 8;
   this->kValue = 1.0;
 }
@@ -73,6 +60,16 @@ void Tds_class::update()
   if (digitalRead(TdsCalibraPin) > 0)
     ecCalibration();
   this->voltage = filterRead(TdsSensorPin);
+  Serial.printf("Voltage Filtrada= %f\n", voltage);
+
+  this->voltage = analogRead(TdsSensorPin) * this->aref / this->adcRange;
+  Serial.printf("Voltage Analog= %f\n", voltage);
+
+  this->voltage = analogRead(TdsSensorPin);
+  Serial.printf("Voltage rawECsolution= %f\n", voltage);
+
+  Serial.printf("Voltage do Sistema= %f\n",ESP.getVcc());
+
   this->ecValue = (133.42 * this->voltage * this->voltage * this->voltage - 255.86 * this->voltage * this->voltage + 857.39 * this->voltage) * this->kValue;
   this->ecValue25 = this->ecValue / (1.0 + 0.02 * (this->temperature - 25.0)); // temperature compensation
   this->tdsValue = ecValue25 * TdsFactor;
@@ -90,12 +87,7 @@ float Tds_class::getEcValue()
 
 void Tds_class::readKValues()
 {
-  EEPROM_read(this->kValueAddress, this->kValue);
-  if (EEPROM.read(this->kValueAddress) == 0xFF && EEPROM.read(this->kValueAddress + 1) == 0xFF && EEPROM.read(this->kValueAddress + 2) == 0xFF && EEPROM.read(this->kValueAddress + 3) == 0xFF)
-  {
-    this->kValue = 1.0; // default value: K = 1.0
-    EEPROM_write(this->kValueAddress, this->kValue);
-  }
+  this->kValue = eepromRead(this->kValueAddress);
 }
 
 void Tds_class::ecCalibration()
@@ -106,9 +98,9 @@ void Tds_class::ecCalibration()
   float KValueTemp, rawECsolution;
   rawECsolution = tdsRawValue / (float)(TdsFactor);
   rawECsolution = rawECsolution * (1.0 + 0.02 * (temperature - 25.0));
-  voltage = filterRead(TdsSensorPin);     
+  voltage = filterRead(TdsSensorPin);
   KValueTemp = rawECsolution / (133.42 * voltage * voltage * voltage - 255.86 * voltage * voltage + 857.39 * voltage); // calibrate in the  buffer solution, such as tdsRawValueppm(1413us/cm)@25^c
- 
+
   while (i < 30)
   {
     digitalWrite(TdsComunicaPin, LOW);
@@ -120,7 +112,7 @@ void Tds_class::ecCalibration()
   if ((KValueTemp) > 0.25 && (KValueTemp < 4.0))
   {
     this->kValue = KValueTemp;
-    EEPROM_write(kValueAddress, this->kValue);
+    eepromWrite(this->kValue, this->kValueAddress);
     Serial.print(F(">>>  Sucesso na calibração. Valor de K Salvo na EEPROM, k="));
     Serial.println(this->kValue);
     digitalWrite(TdsComunicaPin, LOW);
@@ -147,7 +139,7 @@ float Tds_class::filterRead(int TdsSensorPin)
     analogBufferIndex++;
     delay(100);
   }
-  float averageVoltage = getMedianNum(analogBuffer) * (float)VREF / 1024.0;
+  float averageVoltage = getMedianNum(analogBuffer) * this->aref / this->adcRange;
   return averageVoltage;
 }
 void Tds_class::bubbleSort(int list[], int n)
@@ -198,6 +190,34 @@ int Tds_class::getMedianNum(int x[])
   int n = sizeof(x) / sizeof(x[0]);
   int y[n];
   medianFilter(x, y, n);
-  int sinalFiltrado = findMedian(y, n);
+  float sinalFiltrado = calcularMedia(y);
   return sinalFiltrado;
+}
+
+#include <EEPROM.h>
+void Tds_class::eepromWrite(float valueToSave, uint addr)
+{
+  // valueToSave => O valor que você deseja salvar
+  // addr >> O endereço na EEPROM onde você deseja salvar o valor
+  EEPROM.begin(512);             // Inicializa a EEPROM. 512 é o número total de bytes na EEPROM
+  EEPROM.put(addr, valueToSave); // Salva o valor no endereço especificado
+  EEPROM.commit();               // Garante que os valores sejam escritos na EEPROM
+}
+float Tds_class::eepromRead(uint addr)
+{
+  // addr >> O endereço na EEPROM onde você deseja ler o valor
+  float valueRead;             // Variável para armazenar o valor lido
+  EEPROM.begin(512);           // Inicializa a EEPROM. 512 é o número total de bytes na EEPROM
+  EEPROM.get(addr, valueRead); // Lê o valor do endereço especificado
+  return valueRead;
+}
+float Tds_class::calcularMedia(int vetor[])
+{
+  int n = sizeof(vetor) / sizeof(vetor[0]);
+  int soma = 0;
+  for (int i = 0; i < n; i++)
+  {
+    soma += vetor[i];
+  }
+  return (float)soma / n;
 }

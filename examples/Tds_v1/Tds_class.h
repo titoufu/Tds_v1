@@ -4,9 +4,8 @@
 
 #define TdsFactor 1.0     // tds = ec / 2
 #define TdsSensorPin A0
-#define TdsCalibraPin A1
-#define TdsComunicaPin A2
-#define VREF 5.0          // analog reference voltage(Volt) of the ADC
+#define TdsCalibraPin D2  // se HIGH calibra, se LOW não.
+#define TdsComunicaPin D5
 #define SCOUNT 30         // sum of sample point
 #define tdsRawValue 1414.0         // sponto de calibração.
 
@@ -49,6 +48,9 @@ private:
     void medianFilter(int *input, int *output, int n);
     int getMedianNum(int x[]);
     int findMedian(int arr[], int n);
+    void eepromWrite(float valueToSave,uint addr);
+    float eepromRead(uint addr);
+    float calcularMedia(int vetor[]);
 };
 
 #endif

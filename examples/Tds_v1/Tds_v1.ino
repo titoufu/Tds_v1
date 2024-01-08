@@ -40,9 +40,12 @@ void setup()
 {
   
   Serial.begin(115200);
-  Tds.setPin(TdsCalibraPin,TdsSensorPin);
-  Tds.setAref(5.0);      // reference voltage on ADC, default 5.0V on Arduino UNO
-  Tds.setAdcRange(1024); // 1024 for 10bit ADC;4096 for 12bit ADC
+   //Tds.setPin(TdsCalibraPin,TdsSensorPin,TdsCalibraPin);
+  pinMode(TdsCalibraPin,OUTPUT);
+  pinMode(TdsComunicaPin,OUTPUT);
+  pinMode(TdsSensorPin,INPUT);
+ // Tds.setAref(4.94);      // reference voltage on ADC, default 5.0V on Arduino UNO
+  //Tds.setAdcRange(1023); // 1024 for 10bit ADC;4096 for 12bit ADC
   Tds.begin();           // initialization
 }
 
@@ -54,5 +57,6 @@ void loop()
   tdsValue = Tds.getTdsValue();    // then get the value
   Serial.print(int (tdsValue));
   Serial.println(" mS/cm");
+  Serial.print("Kvalue= ");Serial.println(Tds.getKvalue());
   delay(1000); 
 }
